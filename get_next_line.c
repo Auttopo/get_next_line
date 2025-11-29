@@ -13,105 +13,177 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-unsigned int	read_len(int fd)
+#define BUFFER_SIZE 3
+
+void	move_buff(char *dest, char *src)
 {
 	unsigned int	i;
-	int				check;
-	char			buff[1];
 
 	i = 0;
-	check = 1;
-	while (buff[0] != '\n' && check == 1)
+	while(src[i])
 	{
-		check = read(fd, buff, 1);
+		dest[i] = src[i];
 		i++;
 	}
+	while (i < BUFFER_SIZE + 1)
+	{
+		dest[i] = '\0';
+		i++;
+	}
+}
+
+unsigned int	no_null_strlen(char *str)
+{
+	unsigned int	i;
+
+	if (str == NULL)
+		return (0);
+	i = 0;
+	while (str[i])
+		i++;
 	return (i);
 }
 
-void	incr_line(char *old, char *add, unsigned int line)
+void	ft_strcpy_plus(char *dest, char *src, unsigned int start, unsigned int max)
 {
-	int		i;
-	int		start;
-	char	*new;
-
+	unsigned int	i;
+	
 	i = 0;
-
-	while (old[start])
-		start++;
-
-	new = malloc(sizeof(char) * (line + start));
-	if (!new)
-		return (NULL);
-
-	while (old[i])
+	while (i < max)
 	{
-		new[i] = old[i];
-		i++
-	}
-
-	i = 0;
-	while (i < line)
-	{
-		new[start + i] = add[i]
+		dest[start + i] = src[i];
 		i++;
 	}
-	new[start + i] = '\0';
+	dest[start + i] = '\0';
 }
 
-char	*get_line(int fd)
+char	*incr_line(char **old, char *add, unsigned int len)
+{
+	unsigned int	i;
+	unsigned int	start;
+	char			*new;
+
+	i = 0;
+	start = no_null_strlen(*old);
+	new = malloc(sizeof(char) * (len + start + 1));
+	if (new == NULL)
+	{
+//		if (*old != NULL)
+			free(*old);
+		return (NULL);
+	}
+	ft_strcpy_plus(new, *old, 0, start);
+	ft_strcpy_plus(new, add, start, len);
+//	if (*old != NULL)
+		free(*old);
+	*old = new;
+	return (*old);
+}
+
+int	is_new(char **line, char *buff)
+{
+	unsigned int	i;
+	unsigned int	end;
+	unsigned int	len;
+
+	i = 0;
+	*line = NULL;
+
+	while (buff[i] != '\n' && buff[i] && i < BUFFER_SIZE)
+		i++;
+	if (buff[i] != '\n' || buff[i] == '\n' && i == BUFFER_SIZE - 1)
+		return (1);
+	i++;
+	len = i;
+	while (buff[len] != '\n' && buff[len] && len < BUFFER_SIZE)
+		len++;
+	if (buff[len] == '\n')
+		len++;
+	*line = malloc(sizeof(char) * (len - i + 1));
+	if (*line == NULL)
+		return (0);
+	ft_strcpy_plus(*line, buff + i, 0, len - i);
+	if (buff[len - 1] == '\n')
+	{
+		move_buff(buff, buff + i);
+		return (2);
+	}
+	move_buff(buff, buff + i);
+	return (1);
+}
+
+char	*get_next_line(int fd)
 {
 	unsigned int	i;
 	int				check;
-	char			buff[1001];
-	char			*ary;
+	static char		buff[BUFFER_SIZE];
+	char			*line;
 
-	i = 0;
-	check = 1;
-	while (check == 1)
-	{
-		check = read(fd, buff, 1000);
-
-		buff[check] = '\0';
-		while (buff[i] != '\n' && buff[i])
-		{
-			if (buff[i] == '\n')
-				break ;
-			i++;
-		}
-		incr_line(buff, ary, i):
-	}
-//	ary = malloc(sizeof(char) * (i + 1));
-//	ft_strcpy(buff, ary);
-}
-
-
-char *get_next_line(int fd)
-{
-	char			*ary;
-	unsigned int	i;
-	unsigned int	size;
-
-	size = read_len(fd);
-	ary = malloc(sizeof(char) * size);
-	if (ary == NULL)
+	check = is_new(&line, buff);
+//	__builtin_printf("[%s]BUFF\n", buff);
+	if (check == 0)
 		return (NULL);
-	//read(fd, ary, size);
-	ary[size] = '\0';
-
-	return (ary);
+	if (check == 2)
+		return (line);
+	while (1)
+	{
+		check = read(fd, buff, BUFFER_SIZE);
+		if (check < 1)
+		{
+//			del_buff(buff, BUFFER_SIZE);
+			free (line);
+			return (NULL);
+		}
+		buff[check] = '\0';
+		i = 0;
+		while (buff[i] && buff[i] != '\n')
+			i++;
+		if (buff[i] == '\n')
+			return (incr_line(&line, buff, i + 1));
+		incr_line(&line , buff, check);
+		if (line == NULL)
+			return (NULL);
+	}
+	return (NULL);
 }
+
 
 
 #include <fcntl.h>
 #include <stdio.h>
 int	main()
 {
-	int fic = open("new", O_RDONLY);
-//	printf("%d, %dfd\n", read_len(fic), fic);
-	char *line = get_next_line(fic);
-	printf("%s\n", line);
+/*	int fic = open("new", O_RDONLY);
+	char *line = get_line(fic);
+	char *line2 = get_line(fic);
+	printf("\nRESULT:%s|E\n", line);
+	printf(":RESUL2:%s|E\n", line2);
 	free(line);
+	free(line2);
 
 	close(fic);
+*/
+
+	int i = 0;
+	int fic = open("new", O_RDONLY);
+	char *line = get_next_line(fic);
+	while (i < 10)
+	{
+		printf("\nRESULT%s|%d|E\n", line, i);
+		free(line);
+		line = get_next_line(fic);
+		i++;
+	}
+	free(line);
+	close(fic);
+
+/*	char buff[15];
+	int i = 0;
+	buff[10] = -1;
+	buff[11] = -1;
+	while (i < 15)
+	{
+		printf("%d\n", buff[i]);
+		i++;
+	}*/
 }
