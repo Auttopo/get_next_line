@@ -14,8 +14,8 @@
 #include <stdlib.h>
 #include "get_next_line.h"
 
-
-#define BUFFER_SIZE 3
+#include <stdio.h>
+#define BUFFER_SIZE 6
 
 void	move_buff(char *dest, char *src)
 {
@@ -72,52 +72,7 @@ char	*incr_line(char **old, char *add, unsigned int len)
 	*old = new;
 	return (*old);
 }
-/*
-int	is_new(char **line, char *buff)
-{
-	int	i;
-	int	len;
 
-	i = 0;
-	*line = NULL;
-
-	while (buff[i] != '\n' && buff[i])
-		i++;
-	if (buff[i] == '\0') 
-		return (1);
-	i++;
-	len = i;
-	while (buff[len] != '\n' && buff[len])
-		len++;
-
-	if (buff[len] == '\n' && buff[len])
-		len++;
-
-	if (len - i <= 0)
-		return (1);
-
-	*line = malloc(sizeof(char) * (len - i + 1));
-	if (*line == NULL)
-		return (0);
-	ft_strcpy_plus(*line, buff + i, 0, len - i);
-
-	if (buff[len + 1] == '\0')
-	{
-		move_buff(buff, buff + i);
-		return (2);
-	}
-	move_buff(buff, buff + i);
-	return (1);
-}
-*/
-/*
-char	is_new(char *buff)
-{
-	if (buff[0] == '\0')
-		return;
-	
-}
-*/
 char	*get_line(char **line, char *buff, int fd, int *check)
 {
 	unsigned int	i;
@@ -126,24 +81,24 @@ char	*get_line(char **line, char *buff, int fd, int *check)
 	*check = 1;
 	while (1)
 	{
+			if (*check < 1)
+			{
+				return (NULL);
+			}
+			i = 0;
+			while (buff[i] && buff[i] != '\n')
+				i++;
+			if (buff[i] == '\n')
+			{
+				incr_line(line, buff, i + 1);
+				move_buff(buff, (buff + i + 1));
+				return (*line);
+			}
+			incr_line(line , buff, i + 1);
+			if (*line == NULL)
+				return (NULL);
 		*check = read(fd, buff, BUFFER_SIZE);
-		if (*check < 1)
-		{
-			free (*line);
-			return (NULL);
-		}
 		buff[*check] = '\0';
-		i = 0;
-		while (buff[i] && buff[i] != '\n')
-			i++;
-		if (buff[i] == '\n')
-		{
-			move_buff(buff, (buff + i));
-			return (incr_line(line, buff, i + 1));
-		}
-		incr_line(line , buff, *check);
-		if (*line == NULL)
-			return (NULL);
 	}
 	return (NULL);
 }
@@ -158,18 +113,18 @@ char	*get_next_line(int fd)
 
 	line = NULL;
 	check = 1;
-//	check = is_new(&line, buff);
-//	if (check == 0)
-//		return (NULL);
-//	if (check == 2)
-//		return (line);
 	get_line(&line, buff, fd, &check);
+	if (line[0] == '\0')
+	{
+		free(line);
+		return (NULL);
+	}
 
 	return (line);
 }
 
 
-
+/*
 #include <fcntl.h>
 #include <stdio.h>
 int	main()
@@ -191,7 +146,7 @@ int	main()
 
 
 }
-
+*/
 
 
 
