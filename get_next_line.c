@@ -15,7 +15,7 @@
 #include "get_next_line.h"
 
 
-#define BUFFER_SIZE 30
+#define BUFFER_SIZE 3
 
 void	move_buff(char *dest, char *src)
 {
@@ -53,9 +53,9 @@ char	*incr_line(char **old, char *add, unsigned int len)
 	char			*new;
 
 	start = 0;
-	if (old != NULL)
+	if (*old != NULL)
 	{
-		while (old[start])
+		while (old[0][start])
 			start++;
 	}
 	new = malloc(sizeof(char) * (len + start + 1));
@@ -72,7 +72,7 @@ char	*incr_line(char **old, char *add, unsigned int len)
 	*old = new;
 	return (*old);
 }
-
+/*
 int	is_new(char **line, char *buff)
 {
 	int	i;
@@ -109,6 +109,45 @@ int	is_new(char **line, char *buff)
 	move_buff(buff, buff + i);
 	return (1);
 }
+*/
+/*
+char	is_new(char *buff)
+{
+	if (buff[0] == '\0')
+		return;
+	
+}
+*/
+char	*get_line(char **line, char *buff, int fd, int *check)
+{
+	unsigned int	i;
+
+	*line = NULL;
+	*check = 1;
+	while (1)
+	{
+		*check = read(fd, buff, BUFFER_SIZE);
+		if (*check < 1)
+		{
+			free (*line);
+			return (NULL);
+		}
+		buff[*check] = '\0';
+		i = 0;
+		while (buff[i] && buff[i] != '\n')
+			i++;
+		if (buff[i] == '\n')
+		{
+			move_buff(buff, (buff + i));
+			return (incr_line(line, buff, i + 1));
+		}
+		incr_line(line , buff, *check);
+		if (*line == NULL)
+			return (NULL);
+	}
+	return (NULL);
+}
+
 
 char	*get_next_line(int fd)
 {
@@ -117,30 +156,16 @@ char	*get_next_line(int fd)
 	static char		buff[BUFFER_SIZE + 1];
 	char			*line;
 
-	check = is_new(&line, buff);
-	if (check == 0)
-		return (NULL);
-	if (check == 2)
-		return (line);
-	while (1)
-	{
-		check = read(fd, buff, BUFFER_SIZE);
-		if (check < 1)
-		{
-			free (line);
-			return (NULL);
-		}
-		buff[check] = '\0';
-		i = 0;
-		while (buff[i] && buff[i] != '\n')
-			i++;
-		if (buff[i] == '\n')
-			return (incr_line(&line, buff, i + 1));
-		incr_line(&line , buff, check);
-		if (line == NULL)
-			return (NULL);
-	}
-	return (NULL);
+	line = NULL;
+	check = 1;
+//	check = is_new(&line, buff);
+//	if (check == 0)
+//		return (NULL);
+//	if (check == 2)
+//		return (line);
+	get_line(&line, buff, fd, &check);
+
+	return (line);
 }
 
 
@@ -166,5 +191,7 @@ int	main()
 
 
 }
+
+
 
 
