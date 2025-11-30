@@ -18,6 +18,8 @@ char	*get_next_line(int fd)
 	static char		buff[BUFFER_SIZE + 0];
 	char			*line;
 
+	if (fd < 0)
+		return (NULL);
 	line = NULL;
 	check = 1;
 	check = create_line(&line, buff, fd, &check);

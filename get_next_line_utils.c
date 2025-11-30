@@ -72,7 +72,15 @@ int	create_line(char **line, char *buff, int fd, int *check)
 	while (1)
 	{
 		if (*check < 1)
+		{
+			i = 0;
+			while (i < BUFFER_SIZE + 1)
+			{
+				buff[i] = 0;
+				i++;
+			}
 			return (1);
+		}
 		i = 0;
 		while (buff[i] && buff[i] != '\n')
 			i++;
