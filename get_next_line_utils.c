@@ -34,6 +34,8 @@ void	ft_strcpy_plus(char *dest, char *src, int start, int max)
 	int	i;
 
 	i = 0;
+	if (src == NULL)
+		return ;
 	while (i < max)
 	{
 		dest[start + i] = src[i];
@@ -42,7 +44,7 @@ void	ft_strcpy_plus(char *dest, char *src, int start, int max)
 	dest[start + i] = '\0';
 }
 
-char	*incr_line(char **old, char *add, int len)
+int	incr_line(char **old, char *add, int len)
 {
 	int		start;
 	char	*new;
@@ -55,38 +57,33 @@ char	*incr_line(char **old, char *add, int len)
 	}
 	new = malloc(sizeof(char) * (len + start + 1));
 	if (new == NULL)
-	{
-		free(*old);
-		return (NULL);
-	}
+		return (0);
 	ft_strcpy_plus(new, *old, 0, start);
 	ft_strcpy_plus(new, add, start, len);
 	free(*old);
 	*old = new;
-	return (*old);
+	return (1);
 }
 
-int	get_line(char **line, char *buff, int fd, int *check)
+int	create_line(char **line, char *buff, int fd, int *check)
 {
 	int	i;
 
 	while (1)
 	{
 		if (*check < 1)
-			return (0);
+			return (1);
 		i = 0;
 		while (buff[i] && buff[i] != '\n')
 			i++;
 		if (buff[i] == '\n')
 		{
-			incr_line(line, buff, i + 1);
-			if (*line == NULL)
+			if (incr_line(line, buff, i + 1) == 0)
 				return (0);
 			move_buff(buff, (buff + i + 1));
 			return (1);
 		}
-		incr_line(line, buff, i + 1);
-		if (*line == NULL)
+		if (incr_line(line, buff, i + 0) == 0)
 			return (0);
 		*check = read(fd, buff, BUFFER_SIZE);
 		buff[*check] = '\0';

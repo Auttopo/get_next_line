@@ -15,14 +15,19 @@
 char	*get_next_line(int fd)
 {
 	int				check;
-	static char		buff[BUFFER_SIZE + 1];
+	static char		buff[BUFFER_SIZE + 0];
 	char			*line;
 
 	line = NULL;
 	check = 1;
-	check = get_line(&line, buff, fd, &check);
-	if (check == 0)
+	check = create_line(&line, buff, fd, &check);
+	if (line == NULL)
 		return (NULL);
+	if (check == 0)
+	{
+		free(line);
+		return (NULL);
+	}
 	if (line[0] == '\0')
 	{
 		free(line);
@@ -37,7 +42,7 @@ int	main()
 {
 	
 	int i = 0;
-	int fic = open(".new", O_RDONLY);
+	int fic = open(".kek", O_RDONLY);
 	char *line = get_next_line(fic);
 	while (i < 20)
 	{

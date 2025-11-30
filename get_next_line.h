@@ -16,10 +16,12 @@
 # include <stdlib.h>
 # include <unistd.h>
 
+//#define BUFFER_SIZE 10
+
 void	move_buff(char *dest, char *src);
 void	ft_strcpy_plus(char *dest, char *src, int start, int max);
-char	*incr_line(char **old, char *add, int len);
-int		get_line(char **line, char *buff, int fd, int *check);
+int		incr_line(char **old, char *add, int len);
+int		create_line(char **line, char *buff, int fd, int *check);
 char	*get_next_line(int fd);
 
 #endif
