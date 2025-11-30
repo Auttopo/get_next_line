@@ -11,8 +11,15 @@
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
-#define GET_NEXT_LINE_H
+# define GET_NEXT_LINE_H
 
+# include <stdlib.h>
+# include <unistd.h>
+
+void	move_buff(char *dest, char *src);
+void	ft_strcpy_plus(char *dest, char *src, int start, int max);
+char	*incr_line(char **old, char *add, int len);
+int		get_line(char **line, char *buff, int fd, int *check);
 char	*get_next_line(int fd);
 
 #endif
