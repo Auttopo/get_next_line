@@ -93,10 +93,10 @@ int	create_line(char **line, char *buff, int fd, int *check)
 			move_buff(buff, (buff + i + 1));
 			return (1);
 		}
-		if (incr_line(line, buff, i + 0) == 0)
+		if (incr_line(line, buff, i) == 0)
 			return (0);
 		*check = read(fd, buff, BUFFER_SIZE);
-		if (*check >= 0)
+		if (*check > 0)
 			buff[*check] = '\0';
 	}
 	del_buff(buff);
