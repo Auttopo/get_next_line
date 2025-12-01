@@ -12,6 +12,18 @@
 
 #include "get_next_line.h"
 
+void	del_buff(char *buff)
+{
+	int	i;
+
+	i = 0;
+	while (i < BUFFER_SIZE)
+	{
+		buff[i] = 0;
+		i++;
+	}
+}
+
 void	move_buff(char *dest, char *src)
 {
 	int	i;
@@ -22,7 +34,7 @@ void	move_buff(char *dest, char *src)
 		dest[i] = src[i];
 		i++;
 	}
-	while (i < BUFFER_SIZE + 1)
+	while (i < BUFFER_SIZE)
 	{
 		dest[i] = '\0';
 		i++;
@@ -69,18 +81,8 @@ int	create_line(char **line, char *buff, int fd, int *check)
 {
 	int	i;
 
-	while (1)
+	while (*check > 0)
 	{
-		if (*check < 1)
-		{
-			i = 0;
-			while (i < BUFFER_SIZE + 1)
-			{
-				buff[i] = 0;
-				i++;
-			}
-			return (1);
-		}
 		i = 0;
 		while (buff[i] && buff[i] != '\n')
 			i++;
@@ -94,7 +96,11 @@ int	create_line(char **line, char *buff, int fd, int *check)
 		if (incr_line(line, buff, i + 0) == 0)
 			return (0);
 		*check = read(fd, buff, BUFFER_SIZE);
-		buff[*check] = '\0';
+		if (*check >= 0)
+			buff[*check] = '\0';
 	}
-	return (0);
+	del_buff(buff);
+	if (*check < 0)
+		return (0);
+	return (1);
 }

@@ -15,7 +15,7 @@
 char	*get_next_line(int fd)
 {
 	int				check;
-	static char		buff[BUFFER_SIZE + 0];
+	static char		buff[BUFFER_SIZE + 1];
 	char			*line;
 
 	if (fd < 0)
@@ -37,14 +37,20 @@ char	*get_next_line(int fd)
 	}
 	return (line);
 }
+// FAUT DEL LES + 0 INUTILES !!!!!!!!!!!!!!!! ---- !!!!!!
+//
+//
 /*
 #include <fcntl.h>
 #include <stdio.h>
-int	main()
+int	main(int argc, char **argv)
 {
-	
+	if (argc != 2)
+		return (0);
+
 	int i = 0;
-	int fic = open(".kek", O_RDONLY);
+	int fic = open(argv[1], O_RDONLY);
+//~/francinette/tests/get_next_line/fsoares/read_error.txt
 	char *line = get_next_line(fic);
 	while (i < 20)
 	{
@@ -55,6 +61,5 @@ int	main()
 	}
 	free(line);
 	close(fic);
-	
 }
 */

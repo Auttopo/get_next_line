@@ -13,11 +13,14 @@
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
+# ifndef BUFFER_SIZE
+# define BUFFER_SIZE 10
+# endif
+
 # include <stdlib.h>
 # include <unistd.h>
 
-//#define BUFFER_SIZE 10
-
+void	del_buff(char *buff);
 void	move_buff(char *dest, char *src);
 void	ft_strcpy_plus(char *dest, char *src, int start, int max);
 int		incr_line(char **old, char *add, int len);
